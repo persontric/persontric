@@ -85,6 +85,7 @@ export class Persontric<
 			}
 		)
 	}
+	/** @see {import('lucia').getUserSessions} */
 	public async person_session_all_(person_id:string):Promise<Session[]> {
 		const databaseSessions = await this.adapter.person_session_all_(person_id)
 		const session_a1:Session[] = []
@@ -102,59 +103,64 @@ export class Persontric<
 		}
 		return session_a1
 	}
+	/** @see {import('lucia').validateSession} */
 	public async session__validate(
-		sessionId:string
-	):Promise<{ user:Person; session:Session }|{ user:null; session:null }> {
-		const [databaseSession, database_person] = await this.adapter.session_person_pair_(sessionId)
-		if (!databaseSession) {
-			return { session: null, user: null }
+		session_id:string
+	):Promise<{ person:Person; session:Session }|{ person:null; session:null }> {
+		const [
+			database_session,
+			database_person
+		] = await this.adapter.session_person_pair_(session_id)
+		if (!database_session) {
+			return { session: null, person: null }
 		}
 		if (!database_person) {
-			await this.adapter.session__delete(databaseSession.id)
-			return { session: null, user: null }
+			await this.adapter.session__delete(database_session.id)
+			return { session: null, person: null }
 		}
-		if (!isWithinExpirationDate(databaseSession.expire_dts)) {
-			await this.adapter.session__delete(databaseSession.id)
-			return { session: null, user: null }
+		if (!isWithinExpirationDate(database_session.expire_dts)) {
+			await this.adapter.session__delete(database_session.id)
+			return { session: null, person: null }
 		}
 		const activePeriodExpirationDate = new Date(
-			databaseSession.expire_dts.getTime() - this.session_expire_ttl.milliseconds() / 2
+			database_session.expire_dts.getTime() - this.session_expire_ttl.milliseconds() / 2
 		)
 		const session:Session = {
-			...this.session_attributes_(databaseSession.attributes),
-			id: databaseSession.id,
-			person_id: databaseSession.person_id,
+			...this.session_attributes_(database_session.attributes),
+			id: database_session.id,
+			person_id: database_session.person_id,
 			fresh: false,
-			expire_dts: databaseSession.expire_dts
+			expire_dts: database_session.expire_dts
 		}
 		if (!isWithinExpirationDate(activePeriodExpirationDate)) {
 			session.fresh = true
 			session.expire_dts = createDate(this.session_expire_ttl)
-			await this.adapter.session_expiration__update(databaseSession.id, session.expire_dts)
+			await this.adapter.session_expiration__update(database_session.id, session.expire_dts)
 		}
-		const user:Person = {
+		const person:Person = {
 			...this.person_attributes_(database_person.attributes),
 			id: database_person.id
 		}
-		return { user, session }
+		return { person, session }
 	}
+	/** @see {import('lucia').createSession} */
 	public async session__create(
 		person_id:string,
 		attributes:RegisterDatabaseSessionAttributes,
 		options?:{
-			sessionId?:string
+			session_id?:string
 		}
 	):Promise<Session> {
-		const sessionId = options?.sessionId ?? id__generate(40)
+		const session_id = options?.session_id ?? id__generate(40)
 		const sessionExpiresAt = createDate(this.session_expire_ttl)
 		await this.adapter.session__set({
-			id: sessionId,
+			id: session_id,
 			person_id,
 			expire_dts: sessionExpiresAt,
 			attributes
 		})
 		const session:Session = {
-			id: sessionId,
+			id: session_id,
 			person_id,
 			fresh: true,
 			expire_dts: sessionExpiresAt,
@@ -162,19 +168,24 @@ export class Persontric<
 		}
 		return session
 	}
-	public async session__invalidate(sessionId:string):Promise<void> {
-		await this.adapter.session__delete(sessionId)
+	/** @see {import('lucia').invalidateSession} */
+	public async session__invalidate(session_id:string):Promise<void> {
+		await this.adapter.session__delete(session_id)
 	}
+	/** @see {import('lucia').invalidateUserSessions} */
 	public async person_session_all__invalidate(person_id:string):Promise<void> {
 		await this.adapter.person_session_all__delete(person_id)
 	}
+	/** @see {import('lucia').deleteExpiredSessions} */
 	public async expired_session_all__delete():Promise<void> {
 		await this.adapter.expired_session_all__delete()
 	}
-	public session_cookie__read(cookieHeader:string):string|null {
-		const sessionId = this.session_cookie_controller.parse(cookieHeader)
-		return sessionId
+	/** @see {import('lucia').readSessionCookie} */
+	public session_cookie__read(cookie_header:string):string|null {
+		const session_id = this.session_cookie_controller.parse(cookie_header)
+		return session_id
 	}
+	/** @see {import('lucia').readBearerToken} */
 	public bearer_token__read(authorizationHeader:string):string|null {
 		const [authScheme, token] = authorizationHeader.split(' ') as [string, string|undefined]
 		if (authScheme !== 'Bearer') {
@@ -182,10 +193,12 @@ export class Persontric<
 		}
 		return token ?? null
 	}
-	public session_cookie__createCookie(sessionId:string):Cookie {
-		return this.session_cookie_controller.createCookie(sessionId)
+	/** @see {import('lucia').createSessionCookie} */
+	public session__createCookie(session_id:string):Cookie {
+		return this.session_cookie_controller.createCookie(session_id)
 	}
-	public session_cookie__createBlankCookie():Cookie {
+	/** @see {import('lucia').createBlankSessionCookie} */
+	public session__createBlankCookie():Cookie {
 		return this.session_cookie_controller.createBlankCookie()
 	}
 }

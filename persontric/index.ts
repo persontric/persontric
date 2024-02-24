@@ -1,18 +1,18 @@
+import type { Persontric } from './core.js'
 export { TimeSpan } from 'oslo'
 export { Cookie } from 'oslo/cookie'
+export type { CookieAttributes } from 'oslo/cookie'
 export { verifyRequestOrigin } from 'oslo/request'
+export { Persontric } from './core.js'
 export type {
-	Persontric,
 	Session,
 	SessionCookieOptions,
 	SessionCookieAttributesOptions,
 	Person,
 } from './core.js'
-import type { Persontric } from './core.js'
 export { Scrypt, LegacyScrypt, id__generate } from './crypto.js'
 export type { PasswordHashingAlgorithm } from './crypto.js'
 export type { DatabaseSession, DatabasePerson, Adapter } from './database.js'
-export type { CookieAttributes } from 'oslo/cookie'
 export interface Register {
 }
 export type RegisterPersontric = Register extends {
