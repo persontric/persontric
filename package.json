@@ -1,0 +1,45 @@
+{
+  "name": "persontric",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Person-centric authentication",
+  "keywords": [
+    "auth",
+    "authentication",
+    "person-centric",
+    "domain",
+    "server"
+  ],
+  "homepage": "https://github.com/persontric/persontric",
+  "bugs": {
+    "url": "https://github.com/persontric/persontric/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/persontric/persontric.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Brian Takita",
+  "types": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "*.md",
+    "*.d.ts",
+    "*.js",
+    "*.json",
+    "persontric"
+  ],
+  "dependencies": {
+    "oslo": "^1.1.2"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "uvu": "^0.5.6"
+  },
+  "peerDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
