@@ -33,7 +33,7 @@
     "persontric"
   ],
   "dependencies": {
-    "oslo": "^1.1.2"
+    "oslo": "^1.1.3"
   },
   "devDependencies": {
     "bun-types": "latest",
