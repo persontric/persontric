@@ -122,7 +122,7 @@ export class Persontric<
 			await this.adapter.session__delete(database_session.id)
 			return { session: null, person: null }
 		}
-		const activePeriodExpirationDate = new Date(
+		const active_period_expiration_date = new Date(
 			database_session.expire_dts.getTime() - this.session_expire_ttl.milliseconds() / 2
 		)
 		const session:Session = {
@@ -132,7 +132,7 @@ export class Persontric<
 			fresh: false,
 			expire_dts: database_session.expire_dts
 		}
-		if (!isWithinExpirationDate(activePeriodExpirationDate)) {
+		if (!isWithinExpirationDate(active_period_expiration_date)) {
 			session.fresh = true
 			session.expire_dts = createDate(this.session_expire_ttl)
 			await this.adapter.session_expiration__update(database_session.id, session.expire_dts)
@@ -152,18 +152,18 @@ export class Persontric<
 		}
 	):Promise<Session> {
 		const session_id = options?.session_id ?? id__generate(40)
-		const sessionExpiresAt = createDate(this.session_expire_ttl)
+		const expire_dts = createDate(this.session_expire_ttl)
 		await this.adapter.session__set({
 			id: session_id,
 			person_id,
-			expire_dts: sessionExpiresAt,
+			expire_dts,
 			attributes
 		})
 		const session:Session = {
 			id: session_id,
 			person_id,
 			fresh: true,
-			expire_dts: sessionExpiresAt,
+			expire_dts,
 			...this.session_attributes_(attributes)
 		}
 		return session

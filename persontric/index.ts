@@ -16,19 +16,19 @@ export type { DatabaseSession, DatabasePerson, Adapter } from './database.js'
 export interface Register {
 }
 export type RegisterPersontric = Register extends {
-		Persontric:infer _Persontric;
+		Persontric:infer _Persontric
 	}
 	? _Persontric extends Persontric<any, any>
 		? _Persontric
 		: Persontric
 	: Persontric;
 export type RegisterDatabasePersonAttributes = Register extends {
-		DatabasePersonAttributes:infer _DatabasePersonAttributes;
+		DatabasePersonAttributes:infer _DatabasePersonAttributes
 	}
 	? _DatabasePersonAttributes
 	: {};
 export type RegisterDatabaseSessionAttributes = Register extends {
-		DatabaseSessionAttributes:infer _DatabaseSessionAttributes;
+		DatabaseSessionAttributes:infer _DatabaseSessionAttributes
 	}
 	? _DatabaseSessionAttributes
 	: {};
